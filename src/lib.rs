@@ -285,6 +285,25 @@ where
     }
 }
 
+#[cfg(feature = "yaml")]
+impl<T> Chain<T>
+where
+    T: Chainable + Serialize + DeserializeOwned,
+{
+    /// Saves the current chain to a YAML string.
+    pub fn to_string(&self) -> Result<String> {
+        let yaml_string =
+            yaml::to_string(self).map_err(|e| Error::new(ErrorKind::InvalidData, e))?;
+        Ok(yaml_string)
+    }
+
+    /// Loads a chain from a YAML string.
+    pub fn from_string(string: &str) -> Result<Self> {
+        let chain = yaml::from_str(string).map_err(|e| Error::new(ErrorKind::InvalidInput, e))?;
+        Ok(chain)
+    }
+}
+
 impl Chain<String> {
     /// Feeds a string of text into the chain.
     pub fn feed_str(&mut self, string: &str) -> &mut Chain<String> {
